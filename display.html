@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TV Slideshow Display</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="tv-container">
+        <div id="blurred-background" class="blurred-bg"></div>
+        
+        <div class="image-display-container">
+            <img id="current-image" src="" alt="Slideshow Image" class="slideshow-image">
+            <p id="no-image-message" style="color:white; z-index:20; display:none;">ไม่มีรูปภาพที่แสดงผลในขณะนี้</p>
+        </div>
+    </div>
+    
+    <script src="display.js"></script>
+</body>
+</html>
