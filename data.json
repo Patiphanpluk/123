@@ -1,0 +1,26 @@
+[
+  {
+    "id": "1",
+    "url": "https://i.pic.in.th/pic/XXXXX.jpg",
+    "expiry_date": "2026-01-01T00:00:00",
+    "display_schedule": {
+      "start_time": "08:00:00",
+      "end_time": "17:00:00",
+      "repeat_days": ["Mon", "Wed", "Fri"],
+      "every_day": false,
+      "duration_sec": 10
+    }
+  },
+  {
+    "id": "2",
+    "url": "https://i.pic.in.th/pic/YYYYY.png",
+    "expiry_date": null,
+    "display_schedule": {
+      "start_time": "00:00:00",
+      "end_time": "23:59:59",
+      "repeat_days": [],
+      "every_day": true,
+      "duration_sec": 15
+    }
+  }
+]
