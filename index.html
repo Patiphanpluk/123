@@ -2,92 +2,433 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Slideshow Manager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title id="pageTitle">ประกาศ</title>
+    
+    <link rel="icon" type="image/png" href="https://img2.pic.in.th/pic/012.1-LOGO---1.png">
+    
     <link rel="stylesheet" href="style.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* 🔴 NEW CSS: Circle Loader & Text Loader Styles 🔴 */
+        /* --- Circle Loader --- */
+        .circle-loader-spin {
+            position: relative;
+            width: 60px; 
+            height: 60px; 
+        }
+
+        .circle-loader-spin:before,
+        .circle-loader-spin:after {
+            content: '';
+            border-radius: 50%;
+            position: absolute;
+            inset: 0;
+            /* ปรับ Shadow สีขาวจาง ๆ สำหรับ Light Mode */
+            box-shadow: 0 0 5px 1px rgba(200, 200, 200, 0.8) inset;
+        }
+
+        .circle-loader-spin:after {
+            /* ใช้สีน้ำเงิน #3b82f6 ของ Theme แทน #2196F3 */
+            box-shadow: 0 4px 0 #3b82f6 inset; 
+            animation: rotate 2s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* --- Text Loader (สำหรับ Modal ประกาศ 20s Timeout) --- */
+        
+        #modalLoaderText {
+             font-size: 0.95rem;
+             font-weight: 500;
+             color: #1e293b; /* 🔴 FIX: เปลี่ยนเป็นสีดำสำหรับ Light Mode */
+             display: inline-block; 
+             position: relative;
+             overflow: hidden;
+             margin-top: 15px;
+             text-align: center;
+             margin-bottom: 0px; 
+        }
+        
+        /* ---------------------------------------------------- */
+        
+        /* *** NEW: CSS สำหรับการจัดวาง Container เมื่อแสดง Menu Card (แก้ไขการกินขอบ) *** */
+        body.menu-scrollable {
+            align-items: flex-start !important; 
+            justify-content: center !important; 
+            padding-top: 20px; 
+            padding-bottom: 20px; 
+            min-height: 100vh; 
+        }
+        
+        /* CSS อื่นๆ ที่จำเป็นสำหรับ Geofencing/Status Card */
+        .status-card {
+            background: #ffffff;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            padding: 40px 32px;
+            position: relative;
+            text-align: center;
+            width: 100%;
+            max-width: 420px;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        .status-card h1 {
+            color: #000000; 
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        .status-card p {
+            color: #475569; 
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+        /* 🔴 FIX: ปรับขนาด Icon Container ให้รองรับ Circle Loader */
+        .status-icon {
+            width: 60px; 
+            height: 60px; 
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* เมนูแอดมิน */
+        #adminMenuButtons {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .neural-button {
+            text-decoration: none;
+            min-height: 55px;
+        }
+        
+        /* สไตล์สำหรับ Geofencing Status Card */
+        #geofenceChecker {
+            display: none;
+            width: 100%;
+        }
+        
+        /* สไตล์สำหรับ Modal (Announcement) */
+        .neural-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(248, 250, 252, 0.8); /* 🔴 FIX: Light BG */
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: flex;
+            align-items: center; 
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        /* NEW: Class สำหรับแสดง Loader ทันทีเมื่อเข้าเว็บ */
+        .neural-modal-overlay.initial-show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .neural-modal-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .neural-modal-content {
+            background: #ffffff; /* 🔴 FIX: Light Card */
+            border: none;
+            padding: 0;
+            border-radius: 20px;
+            max-width: 90vw;
+            width: 400px;
+            height: auto;
+            max-height: 90vh;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            overflow: hidden;
+            display: flex; 
+            flex-direction: column; 
+        }
+        .neural-modal-overlay.show .neural-modal-content,
+        .neural-modal-overlay.initial-show .neural-modal-content {
+             transform: translateY(0);
+             opacity: 1;
+        }
+        /* *** แก้ไข: ปรับสไตล์ของปุ่มปิดสำหรับ Countdown *** */
+        .modal-close-button {
+            position: fixed; 
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.1); /* 🔴 FIX: Light Button BG */
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            color: #000; /* 🔴 FIX: Icon Color */
+            z-index: 1010; 
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            font-size: 22px;
+            line-height: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-close-button:hover {
+            background: #000;
+            color: #fff;
+        }
+        
+        /* สไตล์สำหรับตัวเลขที่ซ่อนกากบาทอยู่ */
+        #countdownText {
+            font-size: 1.2rem; 
+            font-weight: 400; 
+            color: #000000; /* 🔴 FIX: Countdown Text Color */
+            display: none;
+        }
+        
+        /* สไตล์สำหรับกากบาท */
+        .close-icon {
+            display: block; 
+        }
+
+
+        .modal-body {
+            padding: 0; 
+            line-height: 0; 
+            position: relative; 
+            min-height: 150px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1; 
+            overflow-y: auto; 
+        }
+        .modal-body img {
+            width: 100%;
+            height: auto;
+            max-height: 100%; 
+            object-fit: contain; 
+            border-radius: 20px; 
+            margin-top: 0;
+        }
+        .login-header {
+            display: none; 
+        }
+
+        /* 🔴 FIX: โครงสร้าง Modal Loader ใหม่ - ปรับตำแหน่งให้เหมาะสม */
+        #modalLoader {
+            position: absolute;
+            top: 50%; 
+            left: 50%;
+            transform: translate(-50%, -50%); 
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        /* *** แก้ไข: เพิ่ม Padding-top 2px เพื่อเว้นระยะห่างจากรูป *** */
+        #announcementActionArea {
+            padding: 2px 32px 0px !important; 
+            margin-top: 0; 
+            z-index: 5; 
+        }
+        .neural-modal-content {
+            padding-bottom: 0 !important; 
+        }
+        /* แก้ไข: เพิ่มสไตล์เฉพาะสำหรับปุ่ม action ใน Modal ให้ชิดขอบล่าง */
+        #announcementActionButton {
+            border-radius: 0 0 20px 20px !important;
+            min-height: 55px;
+        }
+        .neural-modal-content {
+            padding-bottom: 0 !important; 
+        }
+        #announcementActionButton .button-bg {
+             border-radius: 0 0 20px 20px !important;
+        }
+        
+        /* 🔴 FIX: เพิ่ม margin ให้ปุ่มยืนยันใน Modal Auth */
+        #adminAuthModalOverlay .neural-modal-content {
+            padding-bottom: 32px !important;
+        }
+        
+        /* 🔴 NEW CSS: สำหรับ Footer นับถอยหลังแบบลอยตัว 🔴 */
+        #countdownFooter {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            background: #f8fafc; /* 🔴 FIX: Light Footer BG */
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 990; 
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #countdownTimerText {
+            font-size: 0.95rem;
+            color: #475569; /* 🔴 FIX: Light Footer Text */
+            padding: 10px;
+        }
+        
+        /* 🔴 NEW CSS: สำหรับแถบปุ่มติดกันในหน้า Menu Admin 🔴 */
+        .icon-action-strip {
+            display: flex;
+            width: 100%;
+        }
+        .icon-action-strip .neural-button {
+            flex-grow: 1;
+            width: 50%;
+            min-height: 40px; 
+            margin-bottom: 0 !important;
+            border-radius: 0 !important;
+            /* สไตล์สำหรับแถบสีเทา */
+            background: #e2e8f0 !important;
+            border: none;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        .icon-action-strip .neural-button:first-child {
+            border-right: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 0 12px !important;
+        }
+        .icon-action-strip .neural-button:last-child {
+            border-radius: 0 0 12px 0 !important;
+        }
+        .icon-action-strip .button-text {
+            color: #475569;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        .icon-action-strip .button-text i {
+             margin-right: 5px;
+        }
+    </style>
 </head>
 <body>
-    <div class="admin-container">
-        <h1>🛠️ ระบบจัดการรูปภาพ Slideshow</h1>
-        <p><a href="display.html" target="_blank">👉 เปิดหน้าแสดงผล TV (Display)</a></p>
-        
-        <div class="warning">
-            ⚠️ **ข้อควรระวังเรื่องความปลอดภัยและการทำงาน:** ระบบนี้บันทึกข้อมูลใน **Local Storage** ของเบราว์เซอร์นี้เท่านั้น (ไม่ถาวร) คุณต้อง <a href="https://pic.in.th/" target="_blank">อัปโหลดรูปภาพไปยัง pic.in.th ด้วยตัวเอง</a> และนำ URL มากรอก
-        </div>
-
-        <h2>➕ เพิ่ม/แก้ไขรูปภาพ</h2>
-        <form id="image-form">
-            <input type="hidden" id="image-id">
-
-            <div class="form-group">
-                <label for="image-url">URL รูปภาพ (จาก Pic.in.th)</label>
-                <input type="text" id="image-url" placeholder="เช่น https://i.pic.in.th/pic/XXXXX.jpg" required>
-            </div>
-
-            <div class="form-group">
-                <label for="expiry-date">วันหมดอายุ (ไม่ต้องระบุหากไม่ต้องการ)</label>
-                <input type="date" id="expiry-date">
-            </div>
-
-            <div class="form-group">
-                <label for="duration-sec">ระยะเวลาแสดง (วินาที)</label>
-                <input type="number" id="duration-sec" value="10" min="5" required>
-            </div>
-
-            <h3>ตารางเวลาแสดงผลประจำวัน</h3>
-            <div class="form-group">
-                <label for="start-time">เริ่มแสดงเวลา</label>
-                <input type="time" id="start-time" value="08:00" required>
-            </div>
-            <div class="form-group">
-                <label for="end-time">สิ้นสุดแสดงเวลา</label>
-                <input type="time" id="end-time" value="20:00" required>
-            </div>
-            
-            <div class="form-group">
-                <label>วนซ้ำทุกวัน?</label>
-                <div class="checkbox-group">
-                    <input type="checkbox" id="every-day-check">
-                    <label for="every-day-check">วนทุกวัน (All Days)</label>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>วนซ้ำวันใดบ้าง (หากไม่วนทุกวัน)</label>
-                <div class="checkbox-group">
-                    <input type="checkbox" id="Mon" value="Mon"><label for="Mon">จ.</label>
-                    <input type="checkbox" id="Tue" value="Tue"><label for="Tue">อ.</label>
-                    <input type="checkbox" id="Wed" value="Wed"><label for="Wed">พ.</label>
-                    <input type="checkbox" id="Thu" value="Thu"><label for="Thu">พฤ.</label>
-                    <input type="checkbox" id="Fri" value="Fri"><label for="Fri">ศ.</label>
-                    <input type="checkbox" id="Sat" value="Sat"><label for="Sat">ส.</label>
-                    <input type="checkbox" id="Sun" value="Sun"><label for="Sun">อา.</label>
-                </div>
-            </div>
-
-            <button type="submit" id="submit-btn">บันทึกรูปภาพ</button>
-            <button type="button" id="cancel-btn" style="display:none;">ยกเลิกการแก้ไข</button>
-        </form>
-
-        <hr>
-
-        <h2>🖼️ รูปภาพทั้งหมดที่บันทึกไว้</h2>
-        <table class="image-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>รูปภาพ</th>
-                    <th>ระยะเวลา (วิ)</th>
-                    <th>แสดงวัน/เวลา</th>
-                    <th>วันหมดอายุ</th>
-                    <th>จัดการ</th>
-                </tr>
-            </thead>
-            <tbody id="image-list">
-                </tbody>
-        </table>
+    <div class="neural-background">
+        <div class="neural-node"></div>
+        <div class="neural-node"></div>
+        <div class="neural-node"></div>
+        <div class="neural-node"></div>
+        <div class="neural-node"></div>
     </div>
 
-    <script src="admin.js"></script>
+    <div class="login-container" id="mainContainerWrapper" style="display: none !important;">
+        
+        <div class="status-card" id="mainMenuCard" style="display:none;"> 
+            <div class="ai-glow"></div>
+            
+            <div class="login-header" style="margin-bottom: 10px;">
+                <h1 style="font-size: 1.8rem;" id="menuTitle">ประกาศ</h1>
+                <p>เลือก Studio ที่ต้องการเข้าถึง</p>
+            </div>
+            
+            <div id="adminMenuButtons">
+                </div>
+            
+        </div>
+        
+        <div class="status-card" id="geofenceChecker">
+             <div class="ai-glow"></div>
+            
+            <div class="status-icon" id="statusIcon">
+                <div class="circle-loader-spin"></div>
+            </div>
+            
+            <h1 id="statusTitle">กำลังตรวจสอบตำแหน่ง Studio...</h1> 
+            <p id="statusMessage">โปรดอนุญาตให้เข้าถึงตำแหน่ง GPS ของคุณ</p>
+
+            <button class="neural-button" id="retryButton" style="display:none; margin-bottom: 0;">
+                <div class="button-bg"></div>
+                <span class="button-text">ลองใหม่อีกครั้ง</span>
+                <div class="button-glow"></div>
+            </button>
+        </div>
+        
+    </div>
+
+    <div class="neural-modal-overlay initial-show" id="announcementModalOverlay" style="display:flex;">
+        <div class="login-card neural-modal-content">
+            <div class="ai-glow"></div>
+            <button type="button" class="modal-close-button" id="closeAnnouncementButton" aria-label="Close Announcement">
+                <span id="countdownText"></span>
+                <span class="close-icon">&times;</span> 
+            </button>
+            <div class="login-header" style="margin-bottom: 10px; text-align: center;">
+            </div>
+            
+            <div id="modalLoader" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; display: flex; flex-direction: column; align-items: center;"> 
+                <div class="circle-loader-spin"></div>
+                <p id="modalLoaderText" style="display:none; color: #1e293b; font-size: 0.95rem; margin-top: 10px; font-weight: 500;"></p>
+            </div>
+            
+            <div class="modal-body">
+                <img id="announcementImage" src="" alt="Announcement Image" style="display:none;">
+                
+            </div>
+            
+            <div id="announcementActionArea" style="padding: 0px 32px 0px; width: 100%; display:none;">
+                <button class="neural-button" id="announcementActionButton" type="button" style="margin-bottom: 0; min-height: 55px;">
+                    <div class="button-bg"></div>
+                    <span class="button-text">ข้อความปุ่ม</span> 
+                    <div class="button-glow"></div>
+                </button>
+            </div>
+            
+        </div>
+    </div>
+    
+    <div class="neural-modal-overlay" id="adminAuthModalOverlay" style="display:none;">
+        <div class="login-card neural-modal-content" style="max-width: 350px; padding: 32px; height: auto; transform: translateY(0); opacity: 1; padding-bottom: 32px !important;">
+            <h2 style="color: #000000; margin-bottom: 20px; font-size: 1.5rem; text-align: center;">🛡️ เข้าถึงเมนู Admin</h2>
+            <p style="color: #475569; margin-bottom: 20px; text-align: center;">โปรดใส่รหัสผ่านเพื่อดำเนินการต่อ<br>รหัสเดียวกับรหัส Admin ของท่าน</p>
+            
+            <input type="password" id="adminPasscodeInput" placeholder="รหัสผ่าน" style="
+                width: 100%; 
+                padding: 12px; 
+                margin-bottom: 15px;
+                border-radius: 8px;
+                border: 1px solid #3b82f6;
+                background: #f0f0f5; /* 🔴 FIX: Light Input BG */
+                color: #1e293b; /* 🔴 FIX: Dark Input Text */
+                font-size: 16px;
+                box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* 🔴 FIX: Light Shadow */
+            ">
+            
+            <p id="adminAuthError" style="color: #ef4444; margin-bottom: 15px; display: none; text-align: center;">รหัสผ่านไม่ถูกต้อง</p>
+            
+            <button class="neural-button" id="adminAuthButton" type="button" style="margin-bottom: 0; min-height: 50px;">
+                <div class="button-bg" style="background: #3b82f6;"></div>
+                <span class="button-text" style="color: #ffffff;">ยืนยัน</span> 
+                <div class="button-glow"></div>
+            </button>
+            
+        </div>
+    </div>
+    <div id="countdownFooter" style="display:none;">
+        <p id="countdownTimerText" style="text-align: center;"></p>
+    </div>
+    <script src="script.js"></script>
 </body>
 </html>
