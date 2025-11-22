@@ -3,18 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TV Slideshow Display</title>
+    <title>Admin - Slideshow Manager</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="tv-container">
-        <div id="blurred-background" class="blurred-bg"></div>
+    <div class="admin-container">
+        <h1>🛠️ ระบบจัดการรูปภาพ Slideshow</h1>
+        <p><a href="display.html" target="_blank">👉 เปิดหน้าแสดงผล TV (Display)</a></p>
         
-        <div class="image-display-container">
-            <img id="current-image" src="" alt="Slideshow Image" class="slideshow-image">
+        <div class="warning">
+            ⚠️ **ข้อควรระวังเรื่องความปลอดภัยและการทำงาน:** ระบบนี้บันทึกข้อมูลใน **Local Storage** ของเบราว์เซอร์นี้เท่านั้น (ไม่ถาวร) คุณต้อง <a href="https://pic.in.th/" target="_blank">อัปโหลดรูปภาพไปยัง pic.in.th ด้วยตัวเอง</a> และนำ URL มากรอก
         </div>
+
+        <h2>➕ เพิ่ม/แก้ไขรูปภาพ</h2>
+        <form id="image-form">
+            <input type="hidden" id="image-id">
+
+            <div class="form-group">
+                <label for="image-url">URL รูปภาพ (จาก Pic.in.th)</label>
+                <input type="text" id="image-url" placeholder="เช่น https://i.pic.in.th/pic/XXXXX.jpg" required>
+            </div>
+
+            <div class="form-group">
+                <label for="expiry-date">วันหมดอายุ (ไม่ต้องระบุหากไม่ต้องการ)</label>
+                <input type="date" id="expiry-date">
+            </div>
+
+            <div class="form-group">
+                <label for="duration-sec">ระยะเวลาแสดง (วินาที)</label>
+                <input type="number" id="duration-sec" value="10" min="5" required>
+            </div>
+
+            <h3>ตารางเวลาแสดงผลประจำวัน</h3>
+            <div class="form-group">
+                <label for="start-time">เริ่มแสดงเวลา</label>
+                <input type="time" id="start-time" value="08:00" required>
+            </div>
+            <div class="form-group">
+                <label for="end-time">สิ้นสุดแสดงเวลา</label>
+                <input type="time" id="end-time" value="20:00" required>
+            </div>
+            
+            <div class="form-group">
+                <label>วนซ้ำทุกวัน?</label>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="every-day-check">
+                    <label for="every-day-check">วนทุกวัน (All Days)</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>วนซ้ำวันใดบ้าง (หากไม่วนทุกวัน)</label>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="Mon" value="Mon"><label for="Mon">จ.</label>
+                    <input type="checkbox" id="Tue" value="Tue"><label for="Tue">อ.</label>
+                    <input type="checkbox" id="Wed" value="Wed"><label for="Wed">พ.</label>
+                    <input type="checkbox" id="Thu" value="Thu"><label for="Thu">พฤ.</label>
+                    <input type="checkbox" id="Fri" value="Fri"><label for="Fri">ศ.</label>
+                    <input type="checkbox" id="Sat" value="Sat"><label for="Sat">ส.</label>
+                    <input type="checkbox" id="Sun" value="Sun"><label for="Sun">อา.</label>
+                </div>
+            </div>
+
+            <button type="submit" id="submit-btn">บันทึกรูปภาพ</button>
+            <button type="button" id="cancel-btn" style="display:none;">ยกเลิกการแก้ไข</button>
+        </form>
+
+        <hr>
+
+        <h2>🖼️ รูปภาพทั้งหมดที่บันทึกไว้</h2>
+        <table class="image-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>รูปภาพ</th>
+                    <th>ระยะเวลา (วิ)</th>
+                    <th>แสดงวัน/เวลา</th>
+                    <th>วันหมดอายุ</th>
+                    <th>จัดการ</th>
+                </tr>
+            </thead>
+            <tbody id="image-list">
+                </tbody>
+        </table>
     </div>
-    
-    <script src="script.js"></script>
+
+    <script src="admin.js"></script>
 </body>
 </html>
